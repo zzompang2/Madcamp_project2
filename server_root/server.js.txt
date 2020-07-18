@@ -1,54 +1,74 @@
-//var http = require("http");
-//var socketio = require("socket.io");
-var mysql = require("mysql");
-var express = require("express");
-const bodyParser = require("body-parser");
+// 모듈 선언
+var http = require('http');
+var fs = require('fs');
+var socketio = require('socket.io');
+var express = require('express');
 var app = express();
 
 const hostname = "192.249.19.242";
 const port = 80;
 
-// 서버 생성
-/*const server = app.createServer((request, response) => {
-  response.statusCode = 200;
-  response.setHeader('Content-Type', 'text/plain');
-  response.end('Hello Ham!');
-});*/
-//app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({extended:true}));
+var multer = require('multer');
+const upload = multer({dest:'uploads/'})
+// var path = require('path');var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'uploads/') // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
+//   }
+// })
+// var upload = multer({ storage: storage })
 
-
-// 클라이언트 대기..
-/*server.listen(port, () => {
-  console.log('Server running at http://'+hostname+':'+port+'/');
-});*/
-app.listen(port, 'localhost', function() {
-  console.log('Server running at http://'+hostname+':'+port+'/');
+// 웹서버 생성
+var server = http.createServer(app);
+app.get('/upload', (request, response) => {
+  fs.readFile('HTMLPage.html', (error, data) => {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.end(data);
+  });
 })
 
-app.post('/user/login', function(require, response) {
-  console.log(require.body);
-})
+server.listen(port, () => {
+  console.log('Server Running at '+hostname);
+});
 
-// socket IO 를 서버에 등록하고
-// socket 서버 생성
-//var io = socketio.listen(server);
+//
+var io = socketio.listen(server);
+io.sockets.on('connection', (socket) => {
+  // message 
+  var roomName = null;
 
-/* // socket 으로 정보 주고 받기
-io.sockets.on('connection', function(socket) {
-  console.log('Socket ID: ' + socket.id + ', Connect.')
-  
-  socket.on('clientMessage', function (data1, data2, data3) {
-    console.log('Client Message: ' + data1);
-
-    var message = {
-      msg: 'server',
-      data: 'data'
-    };
-    socket.emit('serverMessage', message);
+  socket.on('join', (data) => {
+    roomName = data;
+    socket.join(data);
   })
-})*/
 
-// Log 기록:
-// hamApp: onFailure
-// hamApp: java.net.ConnectException: Failed to connect to /192.249.19.242:7080
+  socket.on('message', (data) => {
+    io.sockets.in(roomName).emit('message', data);
+    console.log(data);
+  });
+
+  socket.on('image', (data)=>{
+    io.sockets.in(roomName).emit('image', data);
+    console.log(data);
+  })
+  
+});
+
+app.post( '/image', upload.single("image"), function(req, res, next) {
+
+  try {
+   
+    // var file = './uploads' + req.file.filename;
+    console.log(req.file)
+
+    var data = req.file;
+    res.send(data.location);
+
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
