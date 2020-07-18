@@ -46,8 +46,15 @@
 			android:layout_height="wrap_content"
 			android:text="서버로 모두 올리기"
 			app:layout_constraintBottom_toBottomOf="parent"
-			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent" />
+		<Button
+			android:id="@+id/serverButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="서버 사진 가져오기"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			 />
 
 	</androidx.constraintlayout.widget.ConstraintLayout>
 

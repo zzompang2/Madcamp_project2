@@ -1,6 +1,7 @@
 package com.example.phonephoto;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -39,7 +40,8 @@ public class PhotoFragment extends Fragment {
 
     String TAG = "PJ2 PhotoFragment";
 
-    Button backupButton;                                    // button: 서버로 모두 올리기
+    Button backupButton;                                    // 서버로 모두 올리기
+    Button serverButton;                                    // 서버 갤러리 보기
     RecyclerView recyclerView;                              // 갤러리 출력될 recyclerView
     RecyclerView.LayoutManager layoutManager;
     int columnNum = 3;                                      // grid view 행 개수
@@ -51,12 +53,6 @@ public class PhotoFragment extends Fragment {
     GalleryAdapter galleryAdapter;
     Point size;                                             // 기기 화면 사이즈
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        Log.d(TAG, "onCreate");
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
@@ -65,6 +61,7 @@ public class PhotoFragment extends Fragment {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_photo, container, false);
         recyclerView = rootView.findViewById(R.id.recyclerView);
         backupButton = rootView.findViewById(R.id.backupButton);
+        serverButton = rootView.findViewById(R.id.serverButton);
 
         // recyclerView 에 그리드뷰 매니저 연결
         layoutManager = new GridLayoutManager(getContext(), columnNum);
@@ -80,6 +77,14 @@ public class PhotoFragment extends Fragment {
             public void onClick(View view) {
                 cursor = getActivity().getContentResolver().query(imgUri, null, null, null, null);
                 uploadAllFile(cursor);
+            }
+        });
+
+        serverButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ServerGalleryActivity.class);
+                getContext().startActivity(intent);
             }
         });
 
