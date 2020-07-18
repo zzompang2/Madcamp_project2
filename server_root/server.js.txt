@@ -1,30 +1,45 @@
-var http = require("http");
+//var http = require("http");
+//var socketio = require("socket.io");
+var mysql = require("mysql");
 var express = require("express");
-var socketio = require("socket.io");
+const bodyParser = require("body-parser");
 var app = express();
 
 const hostname = "192.249.19.242";
 const port = 80;
 
 // 서버 생성
-const server = http.createServer((request, response) => {
+/*const server = app.createServer((request, response) => {
   response.statusCode = 200;
   response.setHeader('Content-Type', 'text/plain');
   response.end('Hello Ham!');
-});
+});*/
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended:true}));
+
 
 // 클라이언트 대기..
-server.listen(port, () => {
+/*server.listen(port, () => {
   console.log('Server running at http://'+hostname+':'+port+'/');
-});
+});*/
+app.listen(port, 'localhost', function() {
+  console.log('Server running at http://'+hostname+':'+port+'/');
+})
+
+app.post('/user/login', function(require, response) {
+  console.log(require.body);
+})
 
 // socket IO 를 서버에 등록하고
 // socket 서버 생성
-var io = socketio.listen(server);
+//var io = socketio.listen(server);
+
+/* // socket 으로 정보 주고 받기
 io.sockets.on('connection', function(socket) {
   console.log('Socket ID: ' + socket.id + ', Connect.')
-  socket.on('clientMessage', function (data) {
-    console.log('Client Message: ' + data);
+  
+  socket.on('clientMessage', function (data1, data2, data3) {
+    console.log('Client Message: ' + data1);
 
     var message = {
       msg: 'server',
@@ -32,24 +47,8 @@ io.sockets.on('connection', function(socket) {
     };
     socket.emit('serverMessage', message);
   })
-})
+})*/
 
-
-// ----
-const mysql = require("mysql");
-
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  port: 80,
-  database: 'proj2'
-});
-
-connection.connect();
-
-connection.query(
-  'show tables like proj2', (err, rows, fields) => {
-    console.log('image: ' + rows);
-  }
-)
+// Log 기록:
+// hamApp: onFailure
+// hamApp: java.net.ConnectException: Failed to connect to /192.249.19.242:7080
