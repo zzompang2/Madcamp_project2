@@ -8,6 +8,8 @@
 	<!-- 주소록 사용 권한 -->
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
 	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
+	<!-- server 업로드를 위한 인터넷 사용 권한 -->
+	<uses-permission android:name="android.permission.INTERNET" />
 
 	<application
 		android:allowBackup="true"
