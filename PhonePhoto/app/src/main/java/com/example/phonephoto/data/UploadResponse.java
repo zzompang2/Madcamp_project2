@@ -2,7 +2,7 @@ package com.example.phonephoto.data;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ServerResponse {
+public class UploadResponse {
     // variable name should be same as in the json response from php
     @SerializedName("success")
     boolean success;

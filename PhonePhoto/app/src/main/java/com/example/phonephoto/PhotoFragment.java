@@ -21,7 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.phonephoto.data.ServerResponse;
+import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
 
@@ -145,12 +145,13 @@ public class PhotoFragment extends Fragment {
         RequestBody filename;
         ServiceApi getResponse;
         Call call;
+        File file;
 
         while(cursor.moveToNext()) {
             Log.d(TAG, "moveToNext!");
             // Map is used to multipart the file using okhttp3.RequestBody
             absolutePath = cursor.getString(cursor.getColumnIndex("_data"));
-            File file = new File(absolutePath);
+            file = new File(absolutePath);
 
             // Parsing any Media type file
             requestBody = RequestBody.create(MediaType.parse("*/*"), file);
@@ -161,38 +162,36 @@ public class PhotoFragment extends Fragment {
 
             call = getResponse.uploadFile(fileToUpload, filename);
 
-            Log.d("hamApp", "call: " + call.toString());
-            Log.d("hamApp", "file name: " + file.getName());
+            Log.d(TAG, "call: " + call.toString());
+            Log.d(TAG, "file name: " + file.getName());
 
             // enqueue: (데이터의 아이템)을 큐(대기 행렬)에 더하다.
-            call.enqueue(new Callback<ServerResponse>() {
+            call.enqueue(new Callback<UploadResponse>() {
                 @Override
-                public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                    Log.d("hamApp", "onResponse");
-                    ServerResponse serverResponse = response.body();
-                    Log.d("hamApp", String.valueOf(serverResponse));
+                public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                    Log.d(TAG, "onResponse");
+                    UploadResponse serverResponse = response.body();
+                    Log.d(TAG, String.valueOf(serverResponse));
                     if (serverResponse != null) {
-                        Log.d("hamApp", "serverResponse 받았다!");
+                        Log.d(TAG, "serverResponse 받았다!");
                         if (serverResponse.getSuccess()) {
                             Toast.makeText(getContext(), serverResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.d("hamApp", "server msg: " + serverResponse.getMessage());
+                            Log.d(TAG, "server msg: " + serverResponse.getMessage());
                         } else {
                             Toast.makeText(getContext(), serverResponse.getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
                         // Call은 제대로 보냈으나 서버에서 이거뭐냐? 하고 reponse를 보낸 경우 (????)
-                        Log.d("hamApp", "serverResponse 못받았어ㅠ_ㅠ");
-                        assert serverResponse != null;
-                        Log.v("hamApp", serverResponse.toString());
+                        Log.d(TAG, "serverResponse 못받았어ㅠ_ㅠ");
                     }
                 }
 
                 // Call을 서버쪽으로 아예 보내지 못한 경우
                 @Override
-                public void onFailure(Call<ServerResponse> call, Throwable t) {
-                    Log.d("hamApp", "onFailure");
-                    Log.d("hamApp", t.toString());
+                public void onFailure(Call<UploadResponse> call, Throwable t) {
+                    Log.d(TAG, "onFailure");
+                    Log.d(TAG, t.toString());
                 }
             });
         }
