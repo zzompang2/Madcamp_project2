@@ -1,15 +1,18 @@
 package com.example.phonephoto;
 
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,24 +26,23 @@ public class PhotoFragment extends Fragment {
 
     String TAG = "PJ2 PhotoFragment";
 
-    RecyclerView recyclerView;                              // 갤러리 출력될 recyclerView
-    List<String> filesList = new ArrayList<>();             // 갤러리 파일 경로들 저장
-    RecyclerView.LayoutManager layoutManager;
-    int columnNum = 3;
     Button backupButton;                                    // button: 서버로 모두 올리기
+    RecyclerView recyclerView;                              // 갤러리 출력될 recyclerView
+    RecyclerView.LayoutManager layoutManager;
+    int columnNum = 3;                                      // grid view 행 개수
+
+    List<String> filesList = new ArrayList<>();             // 갤러리 파일 경로들 저장
 
     Uri imgUri;                                             // 기기 이미지 파일 uri
     Cursor cursor;                                          // 갤러리 이미지 탐색
     String absolutePath;                                    // 한 이미지 절대경로
     GalleryAdapter galleryAdapter;
+    Point size;                                             // 기기 화면 사이즈
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-
-        /** 권한을 거절했다면 view 출력하지 않도록 하기 **/
-        if( ((MainActivity)getActivity()).arePermissionsDenied() ) return;
     }
 
     @Override
@@ -52,10 +54,20 @@ public class PhotoFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.recyclerView);
         backupButton = rootView.findViewById(R.id.backupButton);
 
+        layoutManager = new GridLayoutManager(getContext(),columnNum);
+        recyclerView.setLayoutManager(layoutManager);
+
+        // 화면 크기에 맞게 이미지를 출력하기 위해 디스플레이의 사이즈를 구함
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        size = new Point();
+        display.getSize(size);
 
         return rootView;
     }
 
+    // MainActivity 에서 권한 허용 선택하기 전에
+    // onCreate, onCreateView는 실행이 되어 버리나,
+    // onResume 은 선택 후에 실행됨.
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
@@ -80,46 +92,17 @@ public class PhotoFragment extends Fragment {
          * 출력: Uri: content://media/external/images/media
          */
         imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Log.d(TAG, "imgUri: " + imgUri);
 
         /** cursor 이용해 얻은 테이블 정보:
          *  | _id | _data | _size | _display_name | mime_type | title | date_added | date_modified | ...
          */
 
-        cursor = getActivity().getContentResolver()
-                .query(imgUri, null, null, null, null);
-        cursor.moveToNext();
-        absolutePath = cursor.getString(cursor.getColumnIndex("_data"));
+        cursor = getActivity().getContentResolver().query(imgUri, null, null, null, null);
+        //absolutePath = cursor.getString(cursor.getColumnIndex("_data"));
 
-        galleryAdapter = new GalleryAdapter(cursor);
+        galleryAdapter = new GalleryAdapter(cursor, size.x/3);
         recyclerView.setAdapter(galleryAdapter);
 
-
-        /*
-        // socket 접속
-        try {
-            socket = IO.socket("http://192.249.19.242:7080");
-            socket.connect();
-            socket.on(Socket.EVENT_CONNECT, onConnect);
-            socket.on("serverMessage", onMessageReceived);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        // 버튼 클릭 시, 서버로 이미지 정보 전달
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    data.put("title", cursor.getString(5));
-                    data.put("img", cursor)
-                    socket.on(Socket.EVENT_CONNECTING,)
-
-                    //URL url = new URL(postTarget);
-                    //HttpFileUpload(urlString, absolutePath);
-
-                } catch (Exception e){
-                }
-            }
-        });*/
     }
 }

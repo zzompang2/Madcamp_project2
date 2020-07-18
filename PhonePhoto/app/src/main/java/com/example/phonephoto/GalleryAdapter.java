@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
     Cursor cursor;
+    int width;
 
     // ViewHolder : 각 view를 보관하는 holder 객체
     public static class GalleryViewHolder extends RecyclerView.ViewHolder {
@@ -26,10 +27,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         }
     }
 
-    public GalleryAdapter(Cursor cursor) {
+    public GalleryAdapter(Cursor cursor, int width) {
         this.cursor = cursor;
+        this.width = width;
     }
-
 
     /*** onCreateViewHolder()
      *
@@ -57,7 +58,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         /** cursor 이용해 얻은 테이블 정보:
          * | _id | _data | _size | _display_name | mime_type | title | date_added | date_modified | ... */
         if(cursor != null && cursor.moveToNext()) {
-            Glide.with(holder.itemView).load(cursor.getString(1)).thumbnail(0.33f).centerCrop().into(holder.image);
+            Glide.with(holder.itemView).load(cursor.getString(1)).override(width).centerCrop().into(holder.image);
         }
 
     }

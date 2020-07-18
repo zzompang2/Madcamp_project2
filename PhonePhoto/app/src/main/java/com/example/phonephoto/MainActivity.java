@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.material.tabs.TabLayout;
+
 public class MainActivity extends AppCompatActivity {
 
     String TAG = "PJ2 MainActivity";
@@ -19,16 +21,16 @@ public class MainActivity extends AppCompatActivity {
     /*** 권한 허용 ***/
     int MY_REQUEST_PERMISSIONS = 1234;                      // 내 임의로 정한 값
     public static final String[] PERMISSIONS = {            // 허용 필요한 권한 list
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_CONTACTS,
-            Manifest.permission.READ_CONTACTS };
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE };
     int NUMBER_OF_PERMISSION = PERMISSIONS.length;          // 권한 개수
 
     /*** 레이아웃 ***/
 //    ViewPager viewPager;
-//    PhotoFragment photoFragment;
 //    PhoneFragment phoneFragment;
+//    PhotoFragment photoFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +41,17 @@ public class MainActivity extends AppCompatActivity {
         if(arePermissionsDenied())
             ActivityCompat.requestPermissions(this, PERMISSIONS, MY_REQUEST_PERMISSIONS);
 
-        /** tab **/
+        /** tab 설정 **/
         ViewPager viewPager = findViewById(R.id.viewPager);
-        PhotoFragment photoFragment = new PhotoFragment();
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
         PhoneFragment phoneFragment = new PhoneFragment();
+        PhotoFragment photoFragment = new PhotoFragment();
 
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), 0);
         viewPagerAdapter.addFragment(phoneFragment, getString(R.string.tab1));
         viewPagerAdapter.addFragment(photoFragment, getString(R.string.tab2));
         viewPager.setAdapter(viewPagerAdapter);
+        tabLayout.setupWithViewPager(viewPager);    // 클릭할 때 바뀌도록.
     }
 
     /** arePermissionsDenied()
