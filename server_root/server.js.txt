@@ -35,10 +35,6 @@ const connection = mysql.createConnection({
   password: '',
   database: 'proj2'
 });
-//connection.connect();
-
-// 웹서버 생성
-//var server = http.createServer(app);
 
 app.listen(port, () => {
   console.log('Server Running at '+hostname);
@@ -71,37 +67,61 @@ app.post('/upload', upload.single('ham1'), function(req, res, next) {
     message: "good job :)"
   })
 })
-//connection.end();
-
-//app.use('/users', express.static('uploads/'));
-
-// 응답 헤더에 Content-Type 이라는 값을 image/png 로 지정해 주었는데, 
-// 이것은 응답하는 데이터가 image 데이터이며 png 파일이라는 것을 알려주는 것입니다. (MIME 타입)
-
-// server.on('request', function(req, res) {
-//   fs.readFile('./uploads/1594779081800.jpg', (err, data) => {
-//     res.writeHead(200, {'Content-Type': 'image/jpg'});
-//     res.write(data);
-//     res.end();
-//   })
-// })
 
 app.post('/download', function(req, res) {
 
-  // Sync가 붙은 것은 동기적 읽기, 붙지 않은 것은 비동기적 읽기입니다. 
-  // 파일을 읽는데 시간이 오래 걸릴 수도 있습니다. 
-  // 동기적 읽기로 읽게 되면 파일을 읽으면서 다른 작업을 동시에 할 수 없습니다. 
-  // 하지만 비동기적으로 읽으면 파일을 읽으면서 다른 작업도 동시에 수행할 수 있고 
-  // 파일을 다 읽으면 매개변수 callback으로 전달한 함수가 호출됩니다.
+  var sql = "SELECT * FROM uploads";
+  // var result = new Array();
 
-  //const img = fs.readFileSync('./uploads/1594779081800.jpg', {encoding: 'base64'});
-  fs.readFile('./uploads/1594779081800.jpg', 'base64', (err, data) => {
-    //console.log(data);
-    // res.writeHead(200, {'Content':'image/jpeg'});
-    // res.end(data);
-    console.log(data)
-    res.json({ name: '1594779081800.jpg', img: data })
-    res.end()
+  // connection.query(sql, (err, rows, fields) => {
+  //   if(err) {
+  //     console.log('SQL error')
+  //   } else {
+  //     console.log(rows)
+  //     const num = rows.length
+  //     var j=0
+  //     for(var i=0; i<num; i++) {
+  //       fs.readFile(rows[j].path, 'base64', (err, data) => {
+  //         result[j] = {name: rows[j].name, img: data}
+  //         j++
+  //       })
+  //     }
+  //     console.log(result)
+  //     res.json(result)
+  //     res.end()
+  //   }
+  // })
+
+
+  var nameArray = new Array();
+  var imgArray = new Array();
+
+  connection.query(sql, (err, rows, fields) => {
+    if(err) {
+      console.log('SQL error')
+    } else {
+      console.log(rows)
+      const num = rows.length
+      console.log(num)
+
+      var j = 0;
+      for(var i=0; i<num; i++) {
+        fs.readFile(rows[j].path, 'base64', (err, data) => {
+          nameArray[j] = rows[j].name
+          imgArray[j] = data
+          j++
+          if(j == num) {
+            console.log(nameArray)
+            res.json({ name: nameArray, img: imgArray }) 
+            res.end()
+          }
+        })
+      }
+    }
   })
-  //res.json({ name: '1594779081800.jpg', img: img })
+
+  // fs.readFile('./uploads/1594779081800.jpg', 'base64', (err, data) => {
+  //   res.json({ name: '1594779081800.jpg', img: data })
+  //   res.end()
+  // })
 })
