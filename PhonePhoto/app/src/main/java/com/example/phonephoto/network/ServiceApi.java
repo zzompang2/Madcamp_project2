@@ -11,7 +11,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -26,7 +25,7 @@ public interface ServiceApi {
     Call<DownloadResponse> downloadFile();
 
     @POST("/get_image")
-    Call<UploadResponse> getOneFile(@Body String path);
+    Call<UploadResponse> getOneFile(@Body String filePath);
 
     @POST("/user/login")
     Call<LoginResponse> userLogin(@Body LoginData data);

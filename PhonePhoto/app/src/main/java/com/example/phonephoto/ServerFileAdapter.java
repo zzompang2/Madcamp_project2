@@ -45,6 +45,14 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
                     zoomInSelectedImage(context, position);
                 }
             });
+
+            downloadButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    downloadSelectedImage(context, position);
+                }
+            });
         }
     }
 
@@ -74,6 +82,10 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
     }
 
     static void zoomInSelectedImage(Context context, int position) {
-        ((ServerGalleryActivity)context).zoomInPhoto(position);
+        ((ServerGalleryActivity)context).zoomInImage(position);
+    }
+
+    static void downloadSelectedImage(Context context, int position) {
+        ((ServerGalleryActivity)context).downloadImage(position);
     }
 }

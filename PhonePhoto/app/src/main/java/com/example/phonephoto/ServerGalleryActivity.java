@@ -6,26 +6,39 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.phonephoto.data.DownloadResponse;
 import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -108,14 +121,14 @@ public class ServerGalleryActivity extends AppCompatActivity {
         });
     }
 
-    public void zoomInPhoto (int position) {
+    public void zoomInImage(int position) {
         Log.d(TAG, "zoomInPhoto");
         final String name = nameArray[position];
         String path = pathArray[position];
 
         imageName.setText(name);
 
-        Log.d(TAG, name + "////" + path);
+        Log.d(TAG, name + ", " + path);
 
         ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
         Call<UploadResponse> call = getResponse.getOneFile(path);
@@ -140,15 +153,14 @@ public class ServerGalleryActivity extends AppCompatActivity {
                     InputStream is = url.openStream();
                     final Bitmap bm = BitmapFactory.decodeStream(is);
                     handler.post(new Runnable() {
-
                         @Override
                         public void run() {  // 화면에 그려줄 작업
-                            imageView.setImageBitmap(bm);
+                            imageView.setImageBitmap(bm); //비트맵 객체로 보여주기
                         }
                     });
-                    imageView.setImageBitmap(bm); //비트맵 객체로 보여주기
-                } catch(Exception e){
 
+                } catch(Exception e){
+                    Log.d(TAG, "error: " + e.getMessage());
                 }
             }
         });
@@ -158,10 +170,83 @@ public class ServerGalleryActivity extends AppCompatActivity {
         constraintLayout.setVisibility(View.INVISIBLE);
     }
 
+
+    public void downloadImage(int position) {
+        Log.d(TAG, "downloadImage");
+        final String name = nameArray[position];
+        String path = pathArray[position];
+
+        ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
+        Call<UploadResponse> call = getResponse.getOneFile(path);
+        call.enqueue(new Callback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                Log.d(TAG, "onResponse");
+            }
+            @Override
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                Log.d(TAG, "onFailure");
+            }
+        });
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {    // 오래 거릴 작업을 구현한다
+                try{
+                    URL url = new URL("http://192.249.19.242:7080/users/" + name );
+                    InputStream is = url.openStream();
+                    final Bitmap bm = BitmapFactory.decodeStream(is);
+                    saveBitmapToFile(bm, "/storage/emulated/0/Download/", name);
+
+                } catch(Exception e){
+                    Log.d(TAG, "error: " + e.getMessage());
+                }
+            }
+        });
+        t.start();
+    }
+
+    public void saveBitmapToFile(Bitmap bitmap, String filePath, String fileName) {
+        Log.d(TAG, "BitmapToFile");
+        Log.d(TAG, filePath +", "+fileName);
+        Log.d(TAG, String.valueOf(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())));
+
+        // filePath 경로에 파일 인스턴스 생성
+        File newFile = new File(filePath, fileName);
+        Log.d(TAG, "newFile: " + String.valueOf(newFile));
+        try {
+            newFile.createNewFile();
+            Log.d(TAG, "newFile: " + String.valueOf(newFile));
+            FileOutputStream out = new FileOutputStream(newFile);
+            Log.d(TAG, "out: " + String.valueOf(out));
+
+            // 스트림에 비트맵 저장
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // 스트림 사용 후 닫기
+            out.close();
+
+            // 이미지 다운 받은 후..
+            // 시스템의 미디어 스캐너를 호출하여 사진을 미디어 제공자의 데이터베이스에 추가한 후
+            // Android 갤러리 애플리케이션 및 다른 앱에서 사용할 수 있도록 하는 방법을 보여줍니다.
+            // 아래 과정이 없으면 파일이 저장되긴 했으나 경로에 대한 정보가 업데이트가 되지 않은 상태로 남아있다.
+            // 그 결과 (실제 파일이 있으나) 갤러리앱 등에서 보이지 않는다.
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            Uri contentUri = Uri.fromFile(newFile);
+            mediaScanIntent.setData(contentUri);
+            this.sendBroadcast(mediaScanIntent);
+
+        } catch (FileNotFoundException e) {
+            Log.d(TAG, "FileNotFoundException: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "IOException: " + e.getMessage());
+        }
+    }
+
     public void backClick(View view) {
         setResult(RESULT_OK);
         finish();
     }
+
     public void backClick2(View view) {
         imageView.setImageBitmap(null);
         selectedImage.setVisibility(View.INVISIBLE);

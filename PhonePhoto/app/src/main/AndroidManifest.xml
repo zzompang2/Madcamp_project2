@@ -3,9 +3,11 @@
 	package="com.example.phonephoto">
 	<!-- 갤러리 사용 권한 -->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 주소록 사용 권한 -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<!-- 주소록 사용 권한 -->
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- server 업로드를 위한 인터넷 사용 권한 -->
+	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
+	<!-- server 업로드를 위한 인터넷 사용 권한 -->
 	<uses-permission android:name="android.permission.INTERNET" />
 
 	<application

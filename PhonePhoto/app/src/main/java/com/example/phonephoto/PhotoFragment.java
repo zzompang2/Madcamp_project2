@@ -24,8 +24,6 @@ import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -125,6 +123,7 @@ public class PhotoFragment extends Fragment {
          *  cursor.getString(1)             => 파일의 절대경로
          */
 
+        Log.d(TAG, "cursor 다시!!");
         cursor = getActivity().getContentResolver().query(imgUri, null, null, null, null);
 
         galleryAdapter = new GalleryAdapter(cursor, size.x/3);
@@ -148,6 +147,8 @@ public class PhotoFragment extends Fragment {
             // Map is used to multipart the file using okhttp3.RequestBody
             absolutePath = cursor.getString(cursor.getColumnIndex("_data"));
             file = new File(absolutePath);
+
+            Log.d(TAG, "absolutePath: "+absolutePath);
 
             // Parsing any Media type file
             requestBody = RequestBody.create(MediaType.parse("*/*"), file);
