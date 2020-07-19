@@ -1,9 +1,7 @@
 package com.example.phonephoto;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,8 +43,6 @@ public class PhotoFragment extends Fragment {
     RecyclerView recyclerView;                              // 갤러리 출력될 recyclerView
     RecyclerView.LayoutManager layoutManager;
     int columnNum = 3;                                      // grid view 행 개수
-
-    List<String> filesList = new ArrayList<>();             // 갤러리 파일 경로들 저장
 
     Uri imgUri;                                             // 기기 이미지 파일 uri
     Cursor cursor;                                          // 갤러리 이미지 탐색

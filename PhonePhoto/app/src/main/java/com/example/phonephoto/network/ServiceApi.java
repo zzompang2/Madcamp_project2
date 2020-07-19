@@ -25,6 +25,9 @@ public interface ServiceApi {
     @POST("/download")
     Call<DownloadResponse> downloadFile();
 
+    @POST("/get_image")
+    Call<UploadResponse> getOneFile(@Body String path);
+
     @POST("/user/login")
     Call<LoginResponse> userLogin(@Body LoginData data);
 

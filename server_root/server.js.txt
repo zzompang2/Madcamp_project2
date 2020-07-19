@@ -40,15 +40,7 @@ app.listen(port, () => {
   console.log('Server Running at '+hostname);
 });
 
-// 폼데이터 또는 폼태그를 이용해 이미지 올리면
-// req.file 으로 정보가 들어와 destination 속성에 지정해둔 경로에 이미지가 저장
-// 이미지 아닌 다른 데이터는 그대로 req.body 에 들어옴
-
-// 미들웨어 upload.single("ham1")는 function 실행 전에 먼저 실행됨.
-// 미들웨어는 사용자가 전송한 데이터 중에서 만약 파일이 포함되어 있다면,
-// 그 파일을 가공해서 req객체에 file 이라는 프로퍼티를 암시적으로 추가도록 약속되어 있는 함수.
-// 그 안의 매개변수 "ham1" 부분에는 form을 통해 전송되는 파일의 name 속성을 가져야 함.
-
+// 앱 -> 서버 이미지 업로드
 app.post('/upload', upload.single('ham1'), function(req, res, next) {
 
   var sql = "INSERT INTO uploads VALUES (?, ?)";
@@ -68,60 +60,44 @@ app.post('/upload', upload.single('ham1'), function(req, res, next) {
   })
 })
 
-app.post('/download', function(req, res) {
+//app.use('/users', express.static('uploads/'));
+
+app.post('/download', function(req, res, next) {
 
   var sql = "SELECT * FROM uploads";
-  // var result = new Array();
-
-  // connection.query(sql, (err, rows, fields) => {
-  //   if(err) {
-  //     console.log('SQL error')
-  //   } else {
-  //     console.log(rows)
-  //     const num = rows.length
-  //     var j=0
-  //     for(var i=0; i<num; i++) {
-  //       fs.readFile(rows[j].path, 'base64', (err, data) => {
-  //         result[j] = {name: rows[j].name, img: data}
-  //         j++
-  //       })
-  //     }
-  //     console.log(result)
-  //     res.json(result)
-  //     res.end()
-  //   }
-  // })
-
-
-  var nameArray = new Array();
-  var imgArray = new Array();
 
   connection.query(sql, (err, rows, fields) => {
     if(err) {
-      console.log('SQL error')
+      console.log('mysql error...')
+
     } else {
-      console.log(rows)
+      var nameArray = new Array()
+      var pathArray = new Array()
       const num = rows.length
       console.log(num)
 
-      var j = 0;
       for(var i=0; i<num; i++) {
-        fs.readFile(rows[j].path, 'base64', (err, data) => {
-          nameArray[j] = rows[j].name
-          imgArray[j] = data
-          j++
-          if(j == num) {
-            console.log(nameArray)
-            res.json({ name: nameArray, img: imgArray }) 
-            res.end()
-          }
-        })
+          nameArray[i] = rows[i].name
+          pathArray[i] = rows[i].path
       }
+
+      res.json({
+        name: nameArray,
+        path: pathArray
+      })
+      console.log(nameArray)
+      res.end()
     }
   })
+})
 
   // fs.readFile('./uploads/1594779081800.jpg', 'base64', (err, data) => {
   //   res.json({ name: '1594779081800.jpg', img: data })
   //   res.end()
   // })
+
+app.post('/get_image', function (req, res, next) {
+  const path = req
+  console.log(req)
+  app.use('/users', express.static('uploads/'))
 })

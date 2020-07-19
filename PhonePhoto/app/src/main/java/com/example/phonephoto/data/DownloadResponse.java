@@ -6,9 +6,9 @@ public class DownloadResponse {
     @SerializedName("name")
     String[] name;
 
-    @SerializedName("img")
-    String[] img;
+    @SerializedName("path")
+    String[] path;
 
     public String[] getName() { return name; }
-    public String[] getImg() { return img; }
+    public String[] getPath() { return path; }
 }
