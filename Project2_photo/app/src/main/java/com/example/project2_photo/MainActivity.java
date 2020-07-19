@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
     Button button;
 
-    Uri imgUri;
+    Uri imgUri;                                             // 기기 이미지 파일 uri
     private Socket socket;
     private JSONObject data;                                // 서버로 전달할 데이터
     Cursor cursor;                                          // 갤러리 이미지 탐색
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Uri: " + String.valueOf(imgUri));
 
         String mimeType = getContentResolver().getType(imgUri);
-        Log.d(TAG, "mimeType: " + mimeType);
+        //Log.d(TAG, "mimeType: " + mimeType);
 
         /** cursor 이용해 얻은 테이블 정보:
          *  | _id | _data | _size | _display_name | mime_type | title | date_added | date_modified | ...
@@ -134,23 +134,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // 버튼 클릭 시, 서버로 이미지 정보 전달
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-//                    data.put("title", cursor.getString(5));
-//                    data.put("img", cursor)
-//                    socket.on(Socket.EVENT_CONNECTING,)
-
-                    //URL url = new URL(postTarget);
-                    //HttpFileUpload(urlString, absolutePath);
-
-                } catch (Exception e){
-
-                }
-            }
-        });
 
         /** 서버로 이미지 전달 **/
         //int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
