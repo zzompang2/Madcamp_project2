@@ -2,27 +2,23 @@ package com.example.phonephoto;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.phonephoto.data.DeleteData;
 import com.example.phonephoto.data.DownloadResponse;
 import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
@@ -33,12 +29,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,7 +47,7 @@ public class ServerGalleryActivity extends AppCompatActivity {
     TextView imageName;
     LinearLayoutManager layoutManager;
     ServerFileAdapter serverFileAdapter;
-    String[] nameArray, pathArray;
+    ArrayList<String> nameArray, pathArray;
 
     Handler handler = new Handler();  // 외부쓰레드 에서 메인 UI화면을 그릴때 사용
 
@@ -123,27 +116,31 @@ public class ServerGalleryActivity extends AppCompatActivity {
 
     public void zoomInImage(int position) {
         Log.d(TAG, "zoomInPhoto");
-        final String name = nameArray[position];
-        String path = pathArray[position];
+        final String name = nameArray.get(position);
+        String path = pathArray.get(position);
 
         imageName.setText(name);
 
-        Log.d(TAG, name + ", " + path);
+        // 이미지 보여주는 거, 한 장씩 불러오는 걸로 해보고 싶었는데 (보안 때문에)
+        // 그냥 보안 신경 안 쓰고 서버 uploads 폴더를 계속 열려있도록 했음.
+        // 그래서 url만 있으면 돼서 이 함수들 필요 없어짐.
 
-        ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
-        Call<UploadResponse> call = getResponse.getOneFile(path);
-
-        call.enqueue(new Callback<UploadResponse>() {
-            @Override
-            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-                Log.d(TAG, "onResponse");
-            }
-
-            @Override
-            public void onFailure(Call<UploadResponse> call, Throwable t) {
-                Log.d(TAG, "onFailure");
-            }
-        });
+//        Log.d(TAG, name + ", " + path);
+//
+//        ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
+//        Call<UploadResponse> call = getResponse.getOneFile(path);
+//
+//        call.enqueue(new Callback<UploadResponse>() {
+//            @Override
+//            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+//                Log.d(TAG, "onResponse");
+//            }
+//
+//            @Override
+//            public void onFailure(Call<UploadResponse> call, Throwable t) {
+//                Log.d(TAG, "onFailure");
+//            }
+//        });
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -173,8 +170,8 @@ public class ServerGalleryActivity extends AppCompatActivity {
 
     public void downloadImage(int position) {
         Log.d(TAG, "downloadImage");
-        final String name = nameArray[position];
-        String path = pathArray[position];
+        final String name = nameArray.get(position);
+        String path = pathArray.get(position);
 
         ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
         Call<UploadResponse> call = getResponse.getOneFile(path);
@@ -240,6 +237,30 @@ public class ServerGalleryActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.d(TAG, "IOException: " + e.getMessage());
         }
+    }
+
+    public void deleteImage(final int position) {
+        Log.d(TAG, "deleteImage");
+        final String name = nameArray.get(position);
+        String path = pathArray.get(position);
+
+        Log.d(TAG, name + ", " + path);
+
+        ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
+        Call<UploadResponse> call = getResponse.deleteFile(new DeleteData(name, path));
+        call.enqueue(new Callback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                Log.d(TAG, "onResponse");
+                nameArray.remove(position);
+                pathArray.remove(position);
+                onResume();
+            }
+            @Override
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                Log.d(TAG, "onFailure");
+            }
+        });
     }
 
     public void backClick(View view) {

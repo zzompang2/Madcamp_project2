@@ -3,7 +3,10 @@ var http = require('http');
 var fs = require('fs');
 var express = require('express');
 var app = express();
-const mysql = require("mysql");
+const mysql = require('mysql');
+// var bodyParser = require('body-parser');
+// app.use(bodyParser.json());
+app.use(express.json());
 
 // server IP & port number
 const hostname = "192.249.19.242";
@@ -48,9 +51,9 @@ app.post('/upload', upload.single('ham1'), function(req, res, next) {
 
   connection.query(sql, value, (err, rows, fields) => {
     if(err) {
-      console.log(req.file.originalname,': there is a same file...')
+      console.log(req.file.originalname,': there is a same file...');
     } else {
-      console.log(req.file.originalname, ': upload complete!')
+      console.log(req.file.originalname, ': upload complete!');
     }
   });
 
@@ -84,20 +87,60 @@ app.post('/download', function(req, res, next) {
       res.json({
         name: nameArray,
         path: pathArray
-      })
-      console.log(nameArray)
-      res.end()
+      });
+      console.log(nameArray);
+      res.end();
     }
-  })
-})
+  });
+});
 
   // fs.readFile('./uploads/1594779081800.jpg', 'base64', (err, data) => {
   //   res.json({ name: '1594779081800.jpg', img: data })
   //   res.end()
   // })
 
-app.post('/get_image', function (req, res, next) {
-  const path = req
-  console.log(req)
-  app.use('/users', express.static('uploads/'))
-})
+// app.post('/get_image', function (req, res, next) {
+//   const path = req.query.path;
+//   console.log(path);
+
+//   app.use('/users', express.static(path));
+// });
+
+app.post('/delete', function (req, res, next) {
+  console.log(req.body);
+
+  const name = req.body.fileName
+  const path = req.body.filePath
+  var sql = "DELETE FROM uploads WHERE path = ?";
+
+  var success = Boolean(true)
+  var message = "delete complete"
+
+  fs.unlink(path, (err) => {
+    if(err) {
+      success = Boolean(false)
+      message = err
+      console.log(err)
+
+    } else {
+      console.log('file delete!')
+  
+      connection.query(sql, path, (err, rows, fields) => {
+        if(err) {
+          success = Boolean(false)
+          message = err
+          console.log(err)
+        } else {
+          console.log('delete in mysql')
+        }
+      })
+    }
+  })
+
+  res.json({
+    success: success,
+    message: message
+  })
+});
+
+app.use('/users', express.static('uploads/'));

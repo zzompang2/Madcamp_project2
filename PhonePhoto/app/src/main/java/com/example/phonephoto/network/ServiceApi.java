@@ -1,5 +1,6 @@
 package com.example.phonephoto.network;
 
+import com.example.phonephoto.data.DeleteData;
 import com.example.phonephoto.data.DownloadResponse;
 import com.example.phonephoto.data.JoinData;
 import com.example.phonephoto.data.JoinResponse;
@@ -14,6 +15,8 @@ import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ServiceApi {
     @Multipart
@@ -24,8 +27,13 @@ public interface ServiceApi {
     @POST("/download")
     Call<DownloadResponse> downloadFile();
 
+    // @Body 는 여러 파라미더를 전달하지 못함. 구조체로 만들어서 전달하자.
+    @POST("/delete")
+    //Call<UploadResponse> deleteFile(@Body String fileName, @Body String filePath);
+    Call<UploadResponse> deleteFile(@Body DeleteData data);
+
     @POST("/get_image")
-    Call<UploadResponse> getOneFile(@Body String filePath);
+    Call<UploadResponse> getOneFile(@Query("path") String filePath);
 
     @POST("/user/login")
     Call<LoginResponse> userLogin(@Body LoginData data);

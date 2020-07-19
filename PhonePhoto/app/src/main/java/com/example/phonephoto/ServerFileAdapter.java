@@ -17,11 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+
 public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.ServerFileViewHolder>{
 
     Context context;
-    String[] fileNames;
-    String[] pathArray;
+    ArrayList<String> fileNames, pathArray;
 
     // ViewHolder : 각 view를 보관하는 holder 객체
     public class ServerFileViewHolder extends RecyclerView.ViewHolder {
@@ -30,6 +31,7 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
         protected TextView fileName;
        // protected ImageButton zoominButton;
         protected ImageButton downloadButton;
+        protected ImageButton deleteButton;
 
         public ServerFileViewHolder(@NonNull final View itemView) {
             super(itemView);
@@ -37,6 +39,7 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
             this.fileName = itemView.findViewById(R.id.fileName);
             //this.zoominButton = itemView.findViewById(R.id.zoominButton);
             this.downloadButton = itemView.findViewById(R.id.downloadButton);
+            this.deleteButton = itemView.findViewById(R.id.deleteButton);
 
             constraintLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -53,10 +56,18 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
                     downloadSelectedImage(context, position);
                 }
             });
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    deleteSelectedImage(context, position);
+                }
+            });
         }
     }
 
-    public ServerFileAdapter(Context context, String[] fileNames, String[] pathArray) {
+    public ServerFileAdapter(Context context, ArrayList<String> fileNames, ArrayList<String> pathArray) {
         this.context = context;
         this.fileNames = fileNames;
         this.pathArray = pathArray;
@@ -72,13 +83,13 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
 
     @Override
     public void onBindViewHolder(@NonNull ServerFileAdapter.ServerFileViewHolder holder, int position) {
-        holder.fileName.setText(fileNames[position]);
+        holder.fileName.setText(fileNames.get(position));
     }
 
     @Override
     public int getItemCount() {
         if(fileNames == null) return 0;
-        return fileNames.length;
+        return fileNames.size();
     }
 
     static void zoomInSelectedImage(Context context, int position) {
@@ -87,5 +98,10 @@ public class ServerFileAdapter extends RecyclerView.Adapter<ServerFileAdapter.Se
 
     static void downloadSelectedImage(Context context, int position) {
         ((ServerGalleryActivity)context).downloadImage(position);
+    }
+
+    static void deleteSelectedImage(Context context, int position) {
+        ((ServerGalleryActivity)context).deleteImage(position);
+
     }
 }
