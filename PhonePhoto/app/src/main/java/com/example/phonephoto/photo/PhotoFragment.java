@@ -1,4 +1,4 @@
-package com.example.phonephoto;
+package com.example.phonephoto.photo;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.phonephoto.MainActivity;
+import com.example.phonephoto.R;
 import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
@@ -46,6 +48,8 @@ public class PhotoFragment extends Fragment {
     int columnNum = 3;                                      // grid view 행 개수
 
     Uri imgUri;                                             // 기기 이미지 파일 uri
+    Uri vidoUri;                                            // 기기 동영상 파일 uri
+    ArrayList<PhotoItem> mediaItems;
     Cursor cursor;                                          // 갤러리 이미지 탐색
     GalleryAdapter galleryAdapter;
     Point size;                                             // 기기 화면 사이즈
@@ -74,6 +78,8 @@ public class PhotoFragment extends Fragment {
             public void onClick(View view) {
                 cursor = getActivity().getContentResolver().query(imgUri, null, null, null, null);
                 uploadAllFile(cursor);
+                Toast.makeText(getContext(), "예!! 모든 사진을 올렸어요~", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -97,26 +103,15 @@ public class PhotoFragment extends Fragment {
         Log.d(TAG, "onResume");
         super.onResume();
 
-        /** 내부 이미지 파일 가져오기 **/
-
-        /** 로컬 저장소의 Pictures 폴더 경로 가져오기 (1) **
-         * 문제: getExternalStoragePublicDirectory()가 API level 29부터 deprecated */
-        // File filePath;
-        // filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-
-        /** 로컬 저장소의 Pictures 폴더 경로 가져오기 (2) **
-         * 출력: filePath: /storage/emulated/0/Android/data/com.example.project2_photo/files/Pictures
-         * 문제: 다른 경로의 폴더도 따로 구해야 함
-         */
-        // File filePath;
-        // filePath = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if(((MainActivity)getActivity()).arePermissionsDenied()) return;
 
         /** 로컬 저장소의 모든 이미지 파일 가져오기
          * MediaStore.Images: image/* MIME 타입의 모든 media들의 Collection
          * 출력: Uri: content://media/external/images/media
          */
+
         imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Log.d(TAG, "imgUri: " + imgUri);
+        vidoUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
         /** cursor 이용해 얻은 테이블 정보:
          *  | _id | _data | _size | _display_name | mime_type | title | date_added | date_modified | ...
@@ -126,18 +121,38 @@ public class PhotoFragment extends Fragment {
          *  cursor.getColumnIndex("_data")  => 1
          *  cursor.getString(1)             => 파일의 절대경로
          */
-
+        String[] imgProjection = new String[]{
+                MediaStore.Images.Media._ID,
+                MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.DATE_ADDED };
         // 생성된 순서로 sorting
-        String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
 
-//        String[] projection = new String[]{
-//                MediaStore.Images.Media._ID,
-//                MediaStore.Images.Media.DISPLAY_NAME,
-//                MediaStore.Images.Media.DATE_TAKEN };
+        mediaItems = new ArrayList<>();
+        cursor = getActivity().getContentResolver().query(imgUri, imgProjection, null, null, sortOrder);
 
-        cursor = getActivity().getContentResolver().query(imgUri, null, null, null, sortOrder);
+        while(cursor.moveToNext()) {
+            PhotoItem photoItem = new PhotoItem(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3));
+            this.mediaItems.add(photoItem);
+        }
 
-        galleryAdapter = new GalleryAdapter(cursor, size.x/3);
+        String[] videoProjection = new String[]{
+                MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.DATA,
+                MediaStore.Video.Media.DISPLAY_NAME,
+                MediaStore.Video.Media.DATE_ADDED };
+
+        sortOrder = MediaStore.Video.Media.DATE_ADDED + " DESC";
+
+        cursor = getActivity().getContentResolver().query(vidoUri, videoProjection, null, null, sortOrder);
+
+        while(cursor.moveToNext()) {
+            PhotoItem photoItem = new PhotoItem(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3));
+            this.mediaItems.add(photoItem);
+        }
+
+        galleryAdapter = new GalleryAdapter(mediaItems, size.x/3);
         recyclerView.setAdapter(galleryAdapter);
     }
 
@@ -162,12 +177,12 @@ public class PhotoFragment extends Fragment {
 
             // Parsing any Media type file
             requestBody = RequestBody.create(MediaType.parse("*/*"), file);
-            fileToUpload = MultipartBody.Part.createFormData("ham1", file.getName(), requestBody);
+            fileToUpload = MultipartBody.Part.createFormData("myFile", file.getName(), requestBody);
             filename = RequestBody.create(MediaType.parse("text/plain"), file.getName());
 
             getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
 
-            call = getResponse.uploadFile(fileToUpload, filename);
+            call = getResponse.uploadPhoto(fileToUpload, filename);
 
             Log.d(TAG, "call: " + call.toString());
             Log.d(TAG, "file name: " + file.getName());
@@ -180,8 +195,8 @@ public class PhotoFragment extends Fragment {
                     UploadResponse serverResponse = response.body();
                     Log.d(TAG, String.valueOf(serverResponse));
                     if (serverResponse != null) {
-                        Log.d(TAG, "serverResponse 받았다!");
-                        if (serverResponse.getSuccess()) {
+                        Log.d(TAG, "uploadAllFile/onResponse: 받았다!");
+                        if (serverResponse.getCode() == 200) {
                             Toast.makeText(getContext(), serverResponse.getMessage(), Toast.LENGTH_SHORT).show();
                             Log.d(TAG, "server msg: " + serverResponse.getMessage());
                         } else {
@@ -190,15 +205,14 @@ public class PhotoFragment extends Fragment {
 
                     } else {
                         // Call은 제대로 보냈으나 서버에서 이거뭐냐? 하고 reponse를 보낸 경우 (????)
-                        Log.d(TAG, "serverResponse 못받았어ㅠ_ㅠ");
+                        Log.d(TAG, "uploadAllFile/onResponse: 못받았어ㅠ_ㅠ");
                     }
                 }
 
                 // Call을 서버쪽으로 아예 보내지 못한 경우
                 @Override
                 public void onFailure(Call<UploadResponse> call, Throwable t) {
-                    Log.d(TAG, "onFailure");
-                    Log.d(TAG, t.toString());
+                    Log.e(TAG, "uploadAllFile/onFailure\n" + t.toString());
                 }
             });
         }

@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.phonephoto.phone.PhoneFragment;
+import com.example.phonephoto.photo.PhotoFragment;
+import com.example.phonephoto.photo.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(TAG, "onCreate");
 
         /** 접근 권한 허용 요청하기 **/
         if(arePermissionsDenied())
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(final int requestCode, final String[] permissions, final int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Log.d(TAG, "onRequestPermissionsResult");
 
         if(requestCode == MY_REQUEST_PERMISSIONS && grantResults.length > 0) {
             if(arePermissionsDenied()) finish();

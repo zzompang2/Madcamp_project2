@@ -4,16 +4,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class UploadResponse {
     // variable name should be same as in the json response from php
-    @SerializedName("success")
-    boolean success;
+    @SerializedName("code")
+    int code;
 
     @SerializedName("message")
     String message;
 
+    public int getCode() {
+        return code;
+    }
+
     public String getMessage() {
         return message;
-    }
-    public boolean getSuccess() {
-        return success;
     }
 }

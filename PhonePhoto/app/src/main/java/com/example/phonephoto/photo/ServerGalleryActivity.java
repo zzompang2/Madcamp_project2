@@ -1,4 +1,4 @@
-package com.example.phonephoto;
+package com.example.phonephoto.photo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,8 +18,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.phonephoto.R;
 import com.example.phonephoto.data.DeleteData;
-import com.example.phonephoto.data.DownloadResponse;
+import com.example.phonephoto.data.ShowResponse;
 import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
@@ -82,23 +83,23 @@ public class ServerGalleryActivity extends AppCompatActivity {
     private void showFile() {
         Log.d(TAG, "showFile");
         ServiceApi getResponse = RetrofitClient.getRetrofit().create(ServiceApi.class);
-        Call<DownloadResponse> call = getResponse.downloadFile();
+        Call<ShowResponse> call = getResponse.photoShow();
 
         Log.d(TAG, String.valueOf(call));
 
-        call.enqueue(new Callback<DownloadResponse>() {
+        call.enqueue(new Callback<ShowResponse>() {
             @Override
-            public void onResponse(Call<DownloadResponse> call, Response<DownloadResponse> response) {
+            public void onResponse(Call<ShowResponse> call, Response<ShowResponse> response) {
                 Log.d(TAG, "onResponse");
 
-                DownloadResponse downloadResponse = response.body();
+                ShowResponse downloadResponse = response.body();
                 Log.d(TAG, String.valueOf(downloadResponse));
 
                 if (downloadResponse != null) {
                     Log.d(TAG, "downloadResponse 받았다!");
 
                     nameArray = downloadResponse.getName();
-                    pathArray = downloadResponse.getPath();
+                    pathArray = downloadResponse.getNumberOrPath();
                     //Log.d(TAG, nameArray[4]);
                     onResume();
 
@@ -109,7 +110,7 @@ public class ServerGalleryActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<DownloadResponse> call, Throwable t) {
+            public void onFailure(Call<ShowResponse> call, Throwable t) {
                 Log.d(TAG, "onFailure");
             }
         });

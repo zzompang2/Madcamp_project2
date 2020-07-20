@@ -3,11 +3,9 @@
 	package="com.example.phonephoto">
 	<!-- 갤러리 사용 권한 -->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<!-- 주소록 사용 권한 -->
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 주소록 사용 권한 -->
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
-	<!-- server 업로드를 위한 인터넷 사용 권한 -->
+	<uses-permission android:name="android.permission.WRITE_CONTACTS" /> <!-- server 업로드를 위한 인터넷 사용 권한 -->
 	<uses-permission android:name="android.permission.INTERNET" />
 
 	<application
@@ -18,6 +16,7 @@
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme">
+		<activity android:name=".phone.ServerPhoneActivity"></activity>
 
 		<meta-data
 			android:name="com.kakao.sdk.AppKey"
@@ -26,14 +25,13 @@
 		<activity android:name=".LoginActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-
 		<activity android:name=".JoinActivity" />
 		<activity android:name=".MainActivity" />
-		<activity android:name=".ServerGalleryActivity" />
-
+		<activity android:name=".photo.ServerGalleryActivity" />
 	</application>
 
 </manifest>

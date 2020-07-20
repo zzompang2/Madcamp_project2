@@ -19,17 +19,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.phonephoto.MainActivity;
 import com.example.phonephoto.R;
-import com.example.phonephoto.ServerGalleryActivity;
+import com.example.phonephoto.photo.ServerGalleryActivity;
+import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
 
-import java.io.File;
 import java.util.ArrayList;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -81,8 +79,9 @@ public class PhoneFragment extends Fragment {
                     String name = cursor.getString(nameTakenColumn);
                     String phoneNum = cursor.getString(phoneColumn);
 
-                    uploadAllInfo(new PhoneUploadData(id, name, phoneNum));
+                    uploadOnePhone(new PhoneUploadData(id, name, phoneNum));
                 }
+                Toast.makeText(getContext(), "유후! 모든 연락처를 올렸어요~", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -90,7 +89,7 @@ public class PhoneFragment extends Fragment {
         serverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ServerGalleryActivity.class);
+                Intent intent = new Intent(getContext(), ServerPhoneActivity.class);
                 getContext().startActivity(intent);
             }
         });
@@ -98,16 +97,14 @@ public class PhoneFragment extends Fragment {
         return rootView;
     }
 
-    // MainActivity 에서 권한 허용 선택하기 전에
-    // onCreate, onCreateView는 실행이 되어 버리나,
-    // onResume 은 선택 후에 실행됨.
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
 
-        phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        if(((MainActivity)getActivity()).arePermissionsDenied()) return;
 
+        phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         cursor = getActivity().getContentResolver().query(phoneUri, null, null, null, null);
 
         int idColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID);
@@ -121,26 +118,26 @@ public class PhoneFragment extends Fragment {
             PhoneItem phoneItem = new PhoneItem(id, name, phoneNum);
             items.add(phoneItem);
 
-            Log.d(TAG, "phone Item: " + id + name + phoneNum);
+            //Log.d(TAG, "phone Item: " + id + name + phoneNum);
         }
 
         phoneAdapter = new PhoneAdapter(items);
         recyclerView.setAdapter(phoneAdapter);
     }
 
-    private void uploadAllInfo(PhoneUploadData phoneUploadData) {
-        service.phoneUpload(phoneUploadData).enqueue(new Callback<PhoneUploadResponse>() {
+    private void uploadOnePhone(PhoneUploadData phoneUploadData) {
+        service.phoneUpload(phoneUploadData).enqueue(new Callback<UploadResponse>() {
             @Override
-            public void onResponse(Call<PhoneUploadResponse> call, Response<PhoneUploadResponse> response) {
-                PhoneUploadResponse result = response.body();
-                Toast.makeText(getContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                UploadResponse result = response.body();
+                Log.d(TAG, "uploadOnePhone/onResponse: "+response.body().getMessage());
                 //showProgress(false);
             }
 
             @Override
-            public void onFailure(Call<PhoneUploadResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "로그인 에러 발생", Toast.LENGTH_SHORT).show();
-                Log.e("로그인 에러 발생", t.getMessage());
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                //Toast.makeText(getContext(), "로그인 에러 발생.. 힝..", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "uploadOnePhone/onFailure: 로그인 에러 발생\n" + t.getMessage());
                 //showProgress(false);
             }
         });

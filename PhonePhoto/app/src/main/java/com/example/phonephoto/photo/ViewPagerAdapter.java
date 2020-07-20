@@ -1,4 +1,4 @@
-package com.example.phonephoto;
+package com.example.phonephoto.photo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

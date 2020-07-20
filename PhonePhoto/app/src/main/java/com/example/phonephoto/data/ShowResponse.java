@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public class DownloadResponse {
+public class ShowResponse {
     @SerializedName("name")
     ArrayList<String> name;
 
-    @SerializedName("path")
-    ArrayList<String> path;
+    @SerializedName("numberOrPath")
+    ArrayList<String> numberOrPath;
 
     public ArrayList<String> getName() { return name; }
-    public ArrayList<String> getPath() { return path; }
+    public ArrayList<String> getNumberOrPath() { return numberOrPath; }
 }

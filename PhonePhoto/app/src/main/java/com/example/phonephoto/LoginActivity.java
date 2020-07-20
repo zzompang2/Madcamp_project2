@@ -11,6 +11,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.phonephoto.data.LoginData;
@@ -36,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private Button mJoinButton;
+    private TextView mJoinButton;
     private Button mLoginButton;
     private ProgressBar mProgressView;
     private ServiceApi service;
@@ -52,8 +53,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mEmailView = (AutoCompleteTextView) findViewById(R.id.login_email);
         mPasswordView = (EditText) findViewById(R.id.login_password);
+        mJoinButton = (TextView) findViewById(R.id.join_button);
         mLoginButton = (Button) findViewById(R.id.login_button);
-        mJoinButton = (Button) findViewById(R.id.join_button);
         mProgressView = (ProgressBar) findViewById(R.id.login_progress);
         service = RetrofitClient.getRetrofit().create(ServiceApi.class);
 

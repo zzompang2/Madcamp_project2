@@ -1,7 +1,6 @@
-package com.example.phonephoto;
+package com.example.phonephoto.photo;
 
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.phonephoto.R;
 
 import java.util.ArrayList;
 
@@ -19,7 +19,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     String TAG = "PJ2 GalleryAdapter";
 
     //Cursor cursor;
-    ArrayList<String> imagePath;
+    ArrayList<PhotoItem> items;
     int width;
 
     // ViewHolder : 각 view를 보관하는 holder 객체
@@ -35,17 +35,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
         }
     }
 
-    public GalleryAdapter(Cursor cursor, int width) {
-
-        //this.cursor = cursor;
+    public GalleryAdapter(ArrayList<PhotoItem> items, int width) {
+        this.items = items;
         this.width = width;
-        this.imagePath = new ArrayList<>();
-
-        /** cursor 이용해 얻은 테이블 정보:
-         * | _id | _data | _size | _display_name | mime_type | title | date_added | date_modified | ... */
-        while(cursor.moveToNext()) {
-            this.imagePath.add(cursor.getString(1));
-        }
     }
 
     /*** onCreateViewHolder()
@@ -74,13 +66,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     @Override
     public void onBindViewHolder(@NonNull GalleryViewHolder holder, int position) {
         //Log.d(TAG, "onBindViewHolder: " + position);
-        Glide.with(holder.itemView).load(imagePath.get(position)).override(width).centerCrop().into(holder.image);
+        Glide.with(holder.itemView).load(items.get(position).getPath()).override(width).centerCrop().into(holder.image);
     }
 
     @Override
     public int getItemCount() {
-        if(imagePath == null) return 0;
-        return imagePath.size();
+        if(items == null) return 0;
+        return items.size();
     }
 }
 

@@ -1,14 +1,13 @@
 package com.example.phonephoto.network;
 
 import com.example.phonephoto.data.DeleteData;
-import com.example.phonephoto.data.DownloadResponse;
+import com.example.phonephoto.data.ShowResponse;
 import com.example.phonephoto.data.JoinData;
 import com.example.phonephoto.data.JoinResponse;
 import com.example.phonephoto.data.LoginData;
 import com.example.phonephoto.data.LoginResponse;
 import com.example.phonephoto.data.UploadResponse;
 import com.example.phonephoto.phone.PhoneUploadData;
-import com.example.phonephoto.phone.PhoneUploadResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -17,17 +16,16 @@ import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ServiceApi {
     @Multipart
-    @POST("/upload")
-    Call<UploadResponse> uploadFile(@Part MultipartBody.Part file, @Part("ham2") RequestBody name);
+    @POST("/photo/upload")
+    Call<UploadResponse> uploadPhoto(@Part MultipartBody.Part file, @Part("fileName") RequestBody name);
 
     // URL이 고정된 서버에서 파일 다운
-    @POST("/download")
-    Call<DownloadResponse> downloadFile();
+    @POST("/photo/show")
+    Call<ShowResponse> photoShow();
 
     // @Body 는 여러 파라미더를 전달하지 못함. 구조체로 만들어서 전달하자.
     @POST("/delete")
@@ -44,8 +42,8 @@ public interface ServiceApi {
     Call<JoinResponse> userJoin(@Body JoinData data);
 
     @POST("/phone/upload")
-    Call<PhoneUploadResponse> phoneUpload(@Body PhoneUploadData data);
+    Call<UploadResponse> phoneUpload(@Body PhoneUploadData data);
 
-//    @POST("/phone/download")
-//    Call<PhoneDownloadResponse> phoneDownload();
+    @POST("/phone/show")
+    Call<ShowResponse> phoneShow();
 }
