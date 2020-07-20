@@ -3,4 +3,5 @@
 	<string name="hello_blank_fragment">(blank...)</string>
 	<string name="tab1">phone</string>
 	<string name="tab2">photo</string>
+	<string name="kakao_app_key">611c17aba68450c3816994abc37de982</string>
 </resources>

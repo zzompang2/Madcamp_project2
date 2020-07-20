@@ -43,4 +43,10 @@ dependencies {
 
     // GSON: JSON을 편리하게 사용하기 위한 라이브러리
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+
+    // 카카오톡
+    implementation 'com.kakao.sdk:usermgmt:1.16.0'
+//    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+//    compile 'com.google.code.gson:gson:2.8.2'
+//    compile 'com.squareup.retrofit2:converter-gson:2.4.0'
 }

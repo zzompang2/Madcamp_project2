@@ -7,6 +7,8 @@ import com.example.phonephoto.data.JoinResponse;
 import com.example.phonephoto.data.LoginData;
 import com.example.phonephoto.data.LoginResponse;
 import com.example.phonephoto.data.UploadResponse;
+import com.example.phonephoto.phone.PhoneUploadData;
+import com.example.phonephoto.phone.PhoneUploadResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -40,4 +42,10 @@ public interface ServiceApi {
 
     @POST("/user/join")
     Call<JoinResponse> userJoin(@Body JoinData data);
+
+    @POST("/phone/upload")
+    Call<PhoneUploadResponse> phoneUpload(@Body PhoneUploadData data);
+
+//    @POST("/phone/download")
+//    Call<PhoneDownloadResponse> phoneDownload();
 }

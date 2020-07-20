@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,7 @@ import com.example.phonephoto.network.RetrofitClient;
 import com.example.phonephoto.network.ServiceApi;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -88,6 +91,7 @@ public class PhotoFragment extends Fragment {
     // MainActivity 에서 권한 허용 선택하기 전에
     // onCreate, onCreateView는 실행이 되어 버리나,
     // onResume 은 선택 후에 실행됨.
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
@@ -123,12 +127,18 @@ public class PhotoFragment extends Fragment {
          *  cursor.getString(1)             => 파일의 절대경로
          */
 
-        Log.d(TAG, "cursor 다시!!");
-        cursor = getActivity().getContentResolver().query(imgUri, null, null, null, null);
+        // 생성된 순서로 sorting
+        String sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+
+//        String[] projection = new String[]{
+//                MediaStore.Images.Media._ID,
+//                MediaStore.Images.Media.DISPLAY_NAME,
+//                MediaStore.Images.Media.DATE_TAKEN };
+
+        cursor = getActivity().getContentResolver().query(imgUri, null, null, null, sortOrder);
 
         galleryAdapter = new GalleryAdapter(cursor, size.x/3);
         recyclerView.setAdapter(galleryAdapter);
-
     }
 
     private void uploadAllFile(Cursor cursor) {
@@ -192,6 +202,5 @@ public class PhotoFragment extends Fragment {
                 }
             });
         }
-        Log.d(TAG, "cursor-end");
     }
 }
