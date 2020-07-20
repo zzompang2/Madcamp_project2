@@ -1,6 +1,7 @@
 package com.example.phonephoto.phone;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,13 @@ import java.util.ArrayList;
 
 public class ServerPhoneAdapter extends RecyclerView.Adapter<ServerPhoneAdapter.ServerPhoneViewHolder>{
 
+    String TAG = "PJ2 ServerPhoneAdapter";
     Context context;
     ArrayList<String> nameArray, numberArray;
 
     // ViewHolder : 각 view를 보관하는 holder 객체
     public class ServerPhoneViewHolder extends RecyclerView.ViewHolder {
+
 
         protected ConstraintLayout constraintLayout;
         protected TextView phoneName;
@@ -31,6 +34,7 @@ public class ServerPhoneAdapter extends RecyclerView.Adapter<ServerPhoneAdapter.
         protected ImageButton deleteButton;
 
         public ServerPhoneViewHolder(@NonNull final View itemView) {
+
             super(itemView);
             this.constraintLayout =itemView.findViewById(R.id.constraintLayout);
             this.phoneName = itemView.findViewById(R.id.phoneName);
@@ -60,6 +64,7 @@ public class ServerPhoneAdapter extends RecyclerView.Adapter<ServerPhoneAdapter.
         this.context = context;
         this.nameArray = nameArray;
         this.numberArray = numberArray;
+        Log.d(TAG, "ServerPhoneAdapter");
     }
 
     @NonNull
@@ -67,6 +72,7 @@ public class ServerPhoneAdapter extends RecyclerView.Adapter<ServerPhoneAdapter.
     public ServerPhoneAdapter.ServerPhoneViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.phone_server_item, parent, false);
         ServerPhoneAdapter.ServerPhoneViewHolder serverPhoneViewHolder = new ServerPhoneAdapter.ServerPhoneViewHolder(view);
+        Log.d(TAG, "onCreateViewHolder");
         return serverPhoneViewHolder;
     }
 
@@ -83,11 +89,11 @@ public class ServerPhoneAdapter extends RecyclerView.Adapter<ServerPhoneAdapter.
     }
 
     static void downloadSelectedPhone(Context context, int position) {
-        //((ServerPhoneActivity)context).downloadPhone(position);
+        ((ServerPhoneActivity)context).downloadPhone(position);
     }
 
     static void deleteSelectedPhone(Context context, int position) {
-        //((ServerPhoneActivity)context).deletePhone(position);
+        ((ServerPhoneActivity)context).deletePhone(position);
 
     }
 }

@@ -107,6 +107,8 @@ public class PhoneFragment extends Fragment {
         phoneUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         cursor = getActivity().getContentResolver().query(phoneUri, null, null, null, null);
 
+        items = new ArrayList<>();
+
         int idColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone._ID);
         int nameTakenColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
         int phoneColumn = cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER);

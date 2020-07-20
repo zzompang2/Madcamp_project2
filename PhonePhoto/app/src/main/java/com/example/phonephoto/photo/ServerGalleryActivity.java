@@ -40,7 +40,7 @@ import retrofit2.Response;
 public class ServerGalleryActivity extends AppCompatActivity {
 
     String TAG = "PJ2 ServerGalleryActivity";
-    private final static String BASE_URL = "http://192.249.19.244:3180/";
+    private final static String BASE_URL = "http://192.249.19.243:9380/";
 
     ConstraintLayout constraintLayout;
     RecyclerView recyclerView;
@@ -148,7 +148,7 @@ public class ServerGalleryActivity extends AppCompatActivity {
             @Override
             public void run() {    // 오래 거릴 작업을 구현한다
                 try{
-                    URL url = new URL("http://192.249.19.242:8080/users/" + name );
+                    URL url = new URL(BASE_URL + "users/" + name );
                     InputStream is = url.openStream();
                     final Bitmap bm = BitmapFactory.decodeStream(is);
                     handler.post(new Runnable() {

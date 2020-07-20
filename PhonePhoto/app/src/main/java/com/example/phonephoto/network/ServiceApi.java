@@ -28,7 +28,7 @@ public interface ServiceApi {
     Call<ShowResponse> photoShow();
 
     // @Body 는 여러 파라미더를 전달하지 못함. 구조체로 만들어서 전달하자.
-    @POST("/delete")
+    @POST("/photo/delete")
     //Call<UploadResponse> deleteFile(@Body String fileName, @Body String filePath);
     Call<UploadResponse> deleteFile(@Body DeleteData data);
 
@@ -46,4 +46,7 @@ public interface ServiceApi {
 
     @POST("/phone/show")
     Call<ShowResponse> phoneShow();
+
+    @POST("/delete_for_id")
+    Call<UploadResponse> deleteForId(@Query("number") String number);
 }

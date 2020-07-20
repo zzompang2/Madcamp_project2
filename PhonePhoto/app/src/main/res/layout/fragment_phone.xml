@@ -35,7 +35,7 @@
 			android:id="@+id/serverButton"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="서버 사진 가져오기"
+			android:text="서버 주소록 가져오기"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toEndOf="@+id/backupButton" />

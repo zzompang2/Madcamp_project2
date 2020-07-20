@@ -29,6 +29,7 @@ public class JoinActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private EditText mNameView;
     private Button mJoinButton;
+    private Button mCancelButton;
     private ProgressBar mProgressView;
     private ServiceApi service;
 
@@ -43,6 +44,7 @@ public class JoinActivity extends AppCompatActivity {
         mPasswordView = (EditText) findViewById(R.id.join_password);
         mNameView = (EditText) findViewById(R.id.join_name);
         mJoinButton = (Button) findViewById(R.id.join_button);
+        mCancelButton = (Button) findViewById(R.id.cancel_button);
         mProgressView = (ProgressBar) findViewById(R.id.join_progress);
 
         service = RetrofitClient.getRetrofit().create(ServiceApi.class);
@@ -53,9 +55,17 @@ public class JoinActivity extends AppCompatActivity {
                 attemptJoin();
             }
         });
+
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     private void attemptJoin() {
+        Log.d(TAG, "attemptJoin");
         mNameView.setError(null);
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -108,6 +118,7 @@ public class JoinActivity extends AppCompatActivity {
         service.userJoin(data).enqueue(new Callback<JoinResponse>() {
             @Override
             public void onResponse(Call<JoinResponse> call, Response<JoinResponse> response) {
+                Log.d(TAG, "onResponse");
                 JoinResponse result = response.body();
                 Toast.makeText(JoinActivity.this, result.getMessage(), Toast.LENGTH_SHORT).show();
                 showProgress(false);
@@ -119,6 +130,7 @@ public class JoinActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JoinResponse> call, Throwable t) {
+                Log.d(TAG, "onFailure");
                 Toast.makeText(JoinActivity.this, "회원가입 에러 발생", Toast.LENGTH_SHORT).show();
                 Log.e("회원가입 에러 발생", t.getMessage());
                 showProgress(false);
