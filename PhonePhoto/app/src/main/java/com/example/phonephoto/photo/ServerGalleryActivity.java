@@ -40,7 +40,7 @@ import retrofit2.Response;
 public class ServerGalleryActivity extends AppCompatActivity {
 
     String TAG = "PJ2 ServerGalleryActivity";
-    private final static String BASE_URL = "http://192.249.19.243:9380/";
+    private final static String BASE_URL = "http://192.249.19.243:0480/";
 
     ConstraintLayout constraintLayout;
     RecyclerView recyclerView;
